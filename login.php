@@ -1,33 +1,38 @@
 <?php
 
 
-session_start();
+$hostname = 'localhost';
+$username = 'nygts';
+$password = 'lirios00';
+$dbname = 'register';
 
-    try {
-        $pdo = new PDO("pgsql:host=localhost;dbname=register", "nygts", "lirios00" );
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+try {
+    $pdo = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    $email_a_verificar = $_POST['email'] ?? '';
 
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-
-
-        $sql = "SELECT * FROM register WHERE email=?";
-        $executar = $pdo->prepare($sql);
-        $executar->execute([$email]);
-
-        $usuario = $executar->fetch(PDO::FETCH_ASSOC);
-
-        if($usuario && password_verify($senha, $usuario["senha"])) {
-    echo "Acessou";
-}else {
-    "Senha nao existe ou usuario nao encontrado";
-}
-
-    }catch (PDOException $erro) {
-        die("Deu erro: " . $erro->getMessage());
+    //Verifica se a variavel (email fornecido no input usuario) nao esta vazio
+    if (empty($email_a_verificar)) {
+        echo "Erro: E-mail não fornecido.";
+        exit;
     }
 
-    session_destroy();
+    $sql = "SELECT COUNT(*) FROM register WHERE email = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$email_a_verificar]);
 
+    $email_existe = $stmt->fetchColumn();
+
+    if ($email_existe > 0) {
+        echo "Este e-mail já está cadastrado.";
+    } else {
+        echo "Este e-mail ainda não está cadastro, cadastre-o. </br>";
+        echo 'Clique aqui para se registrar: <a href="./pages/reg_pag.html">Registrar-se</a>';
+        // A partir daqui, você pode executar o INSERT
+    }
+
+} catch (PDOException $erro) {
+    die("Erro no banco de dados: " . $erro->getMessage());
+}
 ?>

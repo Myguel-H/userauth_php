@@ -26,10 +26,10 @@ try {
     $stmt->execute();
 
     if ($stmt->fetch(PDO::FETCH_ASSOC)) {
-        die("E-mail já cadastrado!");
+        die('E-mail já cadastrado! </br> Faça login: <a href="./pages/log_pag.html">Fazer login</a>');
     }
 
-    $pass = password_hash($password, PASSWORD_DEFAULT);
+    $password = password_hash($password, PASSWORD_DEFAULT);
     $sql = "INSERT INTO register (email, password) VALUES (:email, :password)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':email', $email);
